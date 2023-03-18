@@ -35,7 +35,14 @@ def csv_big_spender(spark, file_path):
     '''
 
     #TODO
-    pass
+    people = spark.read.csv(file_path, header=True, 
+                            schema='first_name STRING, last_name STRING, age INT, income FLOAT, zipcode INT, orders INT, loyalty BOOLEAN, rewards BOOLEAN')
+
+    people.createOrReplaceTempView('people')
+
+    df_big_spender = spark.sql("SELECT * FROM people WHERE orders >= 100 AND rewards = 'false'")
+
+    return df_big_spender
 
 
 
@@ -47,7 +54,13 @@ def main(spark, file_path):
     which_dataset : string, size of dataset to be analyzed
     '''
     #TODO
-    pass
+    times = bench.benchmark(spark, 25, csv_big_spender, file_path)
+
+    print(f'Times to run csv_big_spender 25 times on {file_path}')
+    print(times)
+    print(f'Minimum Time taken: {min(times)}')
+    print(f'Median Time taken: {sorted(times)[len(times)//2]}')
+    print(f'Maximum Time taken: {max(times)}')
 
 # Only enter this block if we're in main
 if __name__ == "__main__":
