@@ -34,7 +34,10 @@ def pq_sum_orders(spark, file_path):
     '''
 
     #TODO
-    pass
+    people = spark.read.parquet(file_path)
+    df_sum_orders = people.groupBy("zipcode").sum("orders")
+
+    return df_sum_orders
 
 
 
@@ -46,7 +49,14 @@ def main(spark, file_path):
     which_dataset : string, size of dataset to be analyzed
     '''
     #TODO
-    pass
+    times = bench.benchmark(spark, 25, pq_sum_orders, file_path)
+
+    print(f'Times to run pq_sum_orders 25 times on {file_path}')
+    print(times)
+    print(f'Minimum Time taken to run pq_sum_orders 25 times on {file_path}: {min(times)}')
+    print(f'Median Time taken to run pq_sum_orders 25 times on {file_path}: {sorted(times)[len(times)//2]}')
+    print(f'Maximum Time taken to run pq_sum_orders 25 times on {file_path}: {max(times)}')
+
 
 # Only enter this block if we're in main
 if __name__ == "__main__":

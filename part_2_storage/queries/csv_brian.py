@@ -36,7 +36,14 @@ def csv_brian(spark, file_path):
     '''
 
     #TODO
-    pass
+    people = spark.read.csv(file_path, header=True, 
+                            schema='first_name STRING, last_name STRING, age INT, income FLOAT, zipcode INT, orders INT, loyalty BOOLEAN, rewards BOOLEAN')
+
+    people.createOrReplaceTempView('people')
+
+    df_brian = spark.sql("SELECT * FROM people WHERE first_name = 'Brian' AND loyalty = 'false'")
+
+    return df_brian
 
 
 
@@ -48,7 +55,13 @@ def main(spark, file_path):
     which_dataset : string, size of dataset to be analyzed
     '''
     #TODO
-    pass
+    times = bench.benchmark(spark, 25, csv_brian, file_path)
+
+    print(f'Times to run csv_brian 25 times on {file_path}')
+    print(times)
+    print(f'Minimum Time taken: {min(times)}')
+    print(f'Median Time taken: {sorted(times)[len(times)//2]}')
+    print(f'Maximum Time taken: {max(times)}')
 
 # Only enter this block if we're in main
 if __name__ == "__main__":
