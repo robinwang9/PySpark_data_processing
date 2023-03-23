@@ -882,7 +882,6 @@ In this report, we compare the performance of three different optimization metho
 | `people_big.parquet` | 1.773 | 1.878 | 7.380 |
 
 ## The original times to run:
-
 -  `pq_brian` 25 times for each dataset
 
 | Dataset                 | Minimum Time (s) | Median Time (s) | Maximum Time (s) |
@@ -913,7 +912,6 @@ In this report, we compare the performance of three different optimization metho
  - All three methods show improved minimum, median, and maximum times for the people_small.parquet and people_moderate.parquet datasets.
  - For the people_big.parquet dataset, Method 3 outperforms both the original pq_brian and csv_brian times, while Method 1 and Method 2 show improvements in minimum and median times, but not in the maximum times.
  - In summary, using the parquet file format with the optimization methods provides better performance when compared to using CSV files without any optimization.
-
 
 # Conclusions
 
