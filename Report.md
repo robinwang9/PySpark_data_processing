@@ -915,7 +915,6 @@ In this report, we compare the performance of three different optimization metho
  - In summary, using the parquet file format with the optimization methods provides better performance when compared to using CSV files without any optimization.
 
 
-
 # Conclusions
 
  - Method 1 (Sorting) shows some improvements, particularly in the minimum time taken for people_small.parquet & people_moderate.parquet.
