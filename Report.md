@@ -406,7 +406,6 @@ Maximum Time taken: 5.835575819015503
 ```
 
 
-
 Times to run pq_brian 25 times on hdfs:/user/jw5487_nyu_edu/people_big.parquet
 ```
 [7.7918713092803955, 3.355710506439209, 2.997004985809326, 2.8850150108337402, 2.890883207321167, 2.84328031539917, 2.882725477218628, 2.742623805999756, 2.870518684387207, 2.755523681640625, 2.661592721939087, 2.7017083168029785, 2.660459280014038, 2.647141933441162, 2.604702949523926, 2.667640209197998, 2.802860975265503, 2.623307466506958, 2.698118209838867, 2.7259411811828613, 2.7555088996887207, 2.6048264503479004, 2.644012928009033, 2.6311161518096924, 2.7319469451904297]
@@ -456,18 +455,56 @@ The results showed that the third method, which leveraged adaptive query executi
 | `people_big.parquet`    | 7.1588           | 7.34223        | 13.599           |
 
 
-# Comparison and Conclusion
+## The original times to run:
+
+-  `pq_sum_orders` 25 times for each dataset
+
+| Dataset                 | Minimum Time (s) | Median Time (s) | Maximum Time (s) |
+|-------------------------|------------------|-----------------|------------------|
+| `people_small.parquet`  | 0.1946          | 0.2503          | 3.8504          |
+| `people_moderate.parquet` | 3.7408        | 3.8839        | 8.0896           |
+| `people_big.parquet`    | 3.7125          | 3.9653       | 10.5856          |
+
+- `csv_sum_orders` 25 times for each dataset
+
+| Dataset                 | Minimum Time (s) | Median Time (s) | Maximum Time (s) |
+|-------------------------|------------------|-----------------|------------------|
+| `peopleSmall.csv`  | 0.2004          | 0.2613          | 6.6845          |
+| `peopleModerate.csv` | 0.7681       | 0.9112	        | 10.5869           |
+| `peopleBig.csv	`    | 24.4099	          | 25.2552       | 33.6748          |
+
+# Comparisons
+
+ ## The comparison of the performance of pq_sum_orders and csv_sum_orders functions:
+
+ - For the small dataset, the pq_sum_orders function has a similar median time (0.2503 s) to the csv_sum_orders function (0.2613 s). However, the maximum time taken by the csv_sum_orders function is significantly higher (6.6845 s) compared to the pq_sum_orders function (3.8504 s).
+ 
+ - For the moderate dataset, the pq_sum_orders function performs better with a lower median time (3.8839 s) compared to the csv_sum_orders function (0.9112 s). The maximum time taken by the csv_sum_orders function is also higher (10.5869 s) than the pq_sum_orders function (8.0896 s).
+ 
+ - For the big dataset, the pq_sum_orders function significantly outperforms the csv_sum_orders function with a much lower median time (3.9653 s) compared to the csv_sum_orders function (25.2552 s). The maximum time taken by the csv_sum_orders function is also much higher (33.6748 s) than the pq_sum_orders function (10.5856 s).
+ 
+ ## When comparing the optimized methods (Method 1, Method 2, and Method 3) to the original pq_sum_orders and csv_sum_orders functions:
+ 
+ - Method 1 (Sorting the DataFrame) shows a significant improvement in median and maximum times compared to the original pq_sum_orders function for all three datasets. It also outperforms the csv_sum_orders function across all datasets in terms of median and maximum times.
+ 
+ - Method 2 (Adding Repartition) has worse median and maximum times than the original pq_sum_orders function for the small and moderate datasets. However, it shows improvement in the median and maximum times for the big dataset. It outperforms the csv_sum_orders function for the big dataset but has worse median and maximum times for the small and moderate datasets.
+ 
+ - Method 3 (Enabling Adaptive Query Execution, Dynamic Partition Pruning, and Leveraging Columnar Storage) has a similar median time compared to the original pq_sum_orders function for the small dataset but shows improvement for the moderate and big datasets. The maximum times have also improved for all three datasets. It also outperforms the csv_sum_orders function in terms of median and maximum times across all datasets.
+
+
+
+# Conclusions
 
  - Method 1 (Sorting) shows the best performance for all three datasets. 
 
  - Method 2 (Repartition) shows the worse performance for all three datasetes compared to the first method.
 
  - Method 3 (Adaptive Query Execution, Dynamic Partition Pruning, and Columnar Storage) shows some improvements in the small and moderate datasets but shows sluggish performance for the big one.
+ 
+ - ## Method 1 (Sorting the DataFrame) is the quickest method. This method has the shortest median times across all three datasets compared to the other methods.
 
-Method 1 (Sorting the DataFrame) is the quickest method. This method has the shortest median times across all three datasets compared to the other methods.
 
-
-## the Code
+# Code:
 
 
 ### Sorting the DataFrame according to a specific column for each of the three datasets:
@@ -610,8 +647,44 @@ In this report, we compare the performance of three different optimization metho
 | `people_moderate.parquet` | 3.2961 | 3.8797 | 6.4257 |
 | `people_big.parquet` | 3.8096 | 3.8804 | 7.0490 |
 
+## The original times to run:
 
-# Comparison and Conclusion
+- `csv_big_spender` 25 times for each dataset:
+
+| Dataset                 | Minimum Time (s) | Median Time (s) | Maximum Time (s) |
+|-------------------------|------------------|-----------------|------------------|
+| `peopleSmall.csv`       | 0.1530           | 0.2018          | 5.6705           |
+| `peopleModerate.csv`    | 0.5477           | 0.6413          | 9.5391           |
+| `peopleBig.csv`         | 22.0380          | 24.1331         | 30.9382          |
+
+- `pq_big_spender` 25 times for each dataset:
+
+| Dataset                        | Minimum Time (s) | Median Time (s) | Maximum Time (s) |
+|--------------------------------|------------------|-----------------|------------------|
+| `people_small.parquet`         | 0.1153           | 0.1644          | 5.5817           |
+| `people_moderate.parquet`      | 3.7326           | 3.8817          | 6.3885           |
+| `people_big.parquet`           | 3.5778           | 3.8813          | 6.4964           |
+
+
+# Comparisons
+
+ ## Comparison of csv_big_spender and pq_big_spender
+
+ - We can see that using the Parquet file format (pq_big_spender) generally results in faster processing times than using the CSV format (csv_big_spender).
+ 
+ - The minimum, median, and maximum times are generally lower for the Parquet format, especially for the larger datasets.
+ 
+ ## When comparing the optimized methods (Method 1, Method 2, and Method 3) to the original pq_big_spender and csv_big_spender functions:
+ 
+ - Method 1: Sorting -- This method shows a general improvement in the minimum and median times across all datasets compared to csv_big_spender. However, the maximum times for the smaller datasets are still higher than those of the original csv_big_spender.
+ - Method 2: Repartition -- The repartition method shows significant improvements in the maximum times across all datasets compared to the original csv_big_spender and pq_big_spender. The minimum and median times for the smaller datasets are also generally faster than the original csv_big_spender.
+ - Method 3: Adaptive Query Execution, Dynamic Partition Pruning, and Columnar Storage -- This method results in the best performance overall, showing improvements in the minimum, median, and maximum times across all datasets compared to the original csv_big_spender. The improvements are most noticeable for the larger datasets.
+
+
+
+
+
+#  Conclusions
 
  - Method 1 (Sorting) shows bad performance for the moderate and big datasets in terms of minimum, median, and maximum time.
 
@@ -619,7 +692,8 @@ In this report, we compare the performance of three different optimization metho
 
  - Method 3 (Adaptive Query Execution, Dynamic Partition Pruning, and Columnar Storage) shows some improvements in the small and moderate datasets but shows bad results for the big one.
 
-Based on the results, Method 2 is the best optimization method for the pq_big_spender function, with the median time being the shortest across all three datasets compared to the other methods.
+ - ## Based on the results, Method 2 is the best optimization method for the pq_big_spender function, with the median time being the shortest across all three datasets compared to the other methods.
+
 
 # Code
 
@@ -807,17 +881,50 @@ In this report, we compare the performance of three different optimization metho
 | `people_moderate.parquet` | 0.159 | 0.198	 | 5.885 |
 | `people_big.parquet` | 1.773 | 1.878 | 7.380 |
 
+## The original times to run:
 
-# Comparison and Conclusion
+-  `pq_brian` 25 times for each dataset
+
+| Dataset                 | Minimum Time (s) | Median Time (s) | Maximum Time (s) |
+|-------------------------|------------------|-----------------|------------------|
+| `people_small.parquet`  | 0.1258          | 0.1787          | 5.8353          |
+| `people_moderate.parquet` | 3.3531        | 3.8689        | 5.8356           |
+| `people_big.parquet`    | 2.6047          | 2.7319       | 7.7919          |
+
+- `csv_brian` 25 times for each dataset
+
+| Dataset                 | Minimum Time (s) | Median Time (s) | Maximum Time (s) |
+|-------------------------|------------------|-----------------|------------------|
+| `peopleSmall.csv`  | 0.1305          | 0.1764          | 5.7092          |
+| `peopleModerate.csv` | 0.4596       | 0.6188	        | 9.6519           |
+| `peopleBig.csv	`    | 21.6393	          | 22.6651	       | 27.2884          |
+
+
+# Comparisons
+
+ ## Comparison of csv_brian and pq_brian
+
+ - We can see that parquet files generally have better performance, with the exception of the peopleSmall dataset, where the median time taken for csv_brian is slightly faster.
+
+ - However, for both peopleModerate and peopleBig datasets, pq_brian shows faster median times compared to the csv_brian.
+ 
+ ## When comparing the optimized methods (Method 1, Method 2, and Method 3) to the original pq_brian and csv_brian functions:
+ 
+ - All three methods show improved minimum, median, and maximum times for the people_small.parquet and people_moderate.parquet datasets.
+ - For the people_big.parquet dataset, Method 3 outperforms both the original pq_brian and csv_brian times, while Method 1 and Method 2 show improvements in minimum and median times, but not in the maximum times.
+ - In summary, using the parquet file format with the optimization methods provides better performance when compared to using CSV files without any optimization.
+
+
+
+# Conclusions
 
  - Method 1 (Sorting) shows some improvements, particularly in the minimum time taken for people_small.parquet & people_moderate.parquet.
 
  - Method 2 (Repartition) shows slight improvements, particularly in the minimum time taken for people_big.parquet.
 
  - Method 3 (Adaptive Query Execution, Dynamic Partition Pruning, and Columnar Storage) provides the best overall performance, with improvements significantly for people_big.parquet.
-
-
-All in all, it appears that Method 3 (Adaptive Query Execution, Dynamic Partition Pruning, and Columnar Storage) is the quickest method for the people_big.parquet dataset, as it has the shortest median time (1.878 seconds) compared to the other methods. However, for the people_small.parquet and people_moderate.parquet datasets, Method 1 (Sorting) is still the quickest.
+ 
+ ## All in all, it appears that Method 3 (Adaptive Query Execution, Dynamic Partition Pruning, and Columnar Storage) is the quickest method for the people_big.parquet dataset, as it has the shortest median time (1.878 seconds) compared to the other methods. However, for the people_small.parquet and people_moderate.parquet datasets, Method 1 (Sorting) is still the quickest.
 
 # Code
 
